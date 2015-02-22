@@ -30,12 +30,12 @@ public final class ApplicationConfig {
      * {@code null} or blank, the application will log a warning. Suggested
      * format is "MyCompany-Application/1.0".
      */
-    static final String APPLICATION_NAME = "";
+    static final String APPLICATION_NAME = "RichardLucasApps-Application/1.0";
 
     /**
      * Specify the package name of the app.
      */
-    static final String PACKAGE_NAME = "";
+    static final String PACKAGE_NAME = "com.richardlucasapps.updayte";
 
     /**
      * Authentication.
@@ -57,6 +57,6 @@ public final class ApplicationConfig {
      * samples.
      * </p>
      */
-    public static final String APK_FILE_PATH = "";
+    public static final String APK_FILE_PATH = "/resources/app-release.apk";
 
 }

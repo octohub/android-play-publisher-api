@@ -56,7 +56,7 @@ public class UploadApkWithListing {
      * Track for uploading the apk, can be 'alpha', beta', 'production' or
      * 'rollout'.
      */
-    private static final String TRACK_BETA = "beta";
+    private static final String TRACK_BETA = "alpha";
 
     public static void main(String[] args) {
         try {
