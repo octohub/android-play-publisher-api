@@ -2,10 +2,15 @@ package com.richardlucasapps.scheduler;
 
 import com.google.play.developerapi.samples.UploadApkWithListing;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Date;
+import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -38,9 +43,9 @@ public class Scheduler {
         @Override
         public void run() {
             System.out.println("running");
-            CrunchifyGetPropertyValues properties = new CrunchifyGetPropertyValues();
+            String properties;
             try {
-                properties.getPropValues();
+                properties = getPropValues();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -48,5 +53,29 @@ public class Scheduler {
             UploadApkWithListing.main(null);
 
         }
+    }
+
+    private static String getPropValues() throws IOException {
+
+        String result = "";
+        Properties prop = new Properties();
+        String propFileName = "version.properties";
+
+        //InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
+        InputStream inputStream = new FileInputStream("/Users/richard/Google Drive/Dev/updayte/app/version.properties");
+
+        if (inputStream != null) {
+            prop.load(inputStream);
+        } else {
+            throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
+        }
+
+        Date time = new Date(System.currentTimeMillis());
+
+        // get the property value and print it out
+        String versionCode = prop.getProperty("VERSION_CODE");
+
+        System.out.println(versionCode);
+        return result;
     }
 }

@@ -17,7 +17,7 @@ import java.util.Properties;
 
 public class CrunchifyGetPropertyValues {
 
-    public String getPropValues() throws IOException {
+    private static String getPropValues() throws IOException {
 
         String result = "";
         Properties prop = new Properties();
