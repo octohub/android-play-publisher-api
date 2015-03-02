@@ -20,10 +20,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import com.google.api.services.androidpublisher.model.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -38,10 +41,6 @@ import com.google.api.services.androidpublisher.AndroidPublisher.Edits.Commit;
 import com.google.api.services.androidpublisher.AndroidPublisher.Edits.Insert;
 import com.google.api.services.androidpublisher.AndroidPublisher.Edits.Apks.Upload;
 import com.google.api.services.androidpublisher.AndroidPublisher.Edits.Tracks.Update;
-import com.google.api.services.androidpublisher.model.Apk;
-import com.google.api.services.androidpublisher.model.ApkListing;
-import com.google.api.services.androidpublisher.model.AppEdit;
-import com.google.api.services.androidpublisher.model.Track;
 
 /**
  * Uploads an apk to the alpha track and updates recent changes description.
@@ -50,16 +49,26 @@ public class UploadApkWithListing {
 
     private static final Log log = LogFactory.getLog(UploadApkWithListing.class);
 
-    private static final String APK_LISTING_RECENT_CHANGES_TEXT = "Apk recent changes en-US";
+    private static String APK_LISTING_RECENT_CHANGES_TEXT = "";
+    private static final String US_LISTING_TITLE = "updayte";
+    private static final String US_LISTING_SHORT_DESCRITPION = "Updates once a day, at 00:00 UTC.";
+    private static final String US_LISTING_FULL_DESCRIPTION = "Updates once a day, at 00:00 UTC.";
+    private static final String LISTINGS_PROMO_VIDEO =
+            "https://www.youtube.com/watch?v=ZNSLQlNSPu8";
 
     /**
      * Track for uploading the apk, can be 'alpha', beta', 'production' or
      * 'rollout'.
      */
-    private static final String TRACK_BETA = "alpha";
+    private static final String TRACK_ALPHA = "alpha";
+    private static final String TRACK_BETA = "beta";
+    private static final String TRACK_PRODUCTION = "production";
 
     public static void main(String[] args) {
         try {
+            //APK_LISTING_RECENT_CHANGES_TEXT = args[0];
+            ZonedDateTime utcNow = ZonedDateTime.now(ZoneId.of("Z"));
+            APK_LISTING_RECENT_CHANGES_TEXT = utcNow.toString();
             Preconditions.checkArgument(!Strings.isNullOrEmpty(ApplicationConfig.PACKAGE_NAME),
                     "ApplicationConfig.PACKAGE_NAME cannot be null or empty!");
 
@@ -98,14 +107,14 @@ public class UploadApkWithListing {
                     .tracks()
                     .update(ApplicationConfig.PACKAGE_NAME,
                             editId,
-                            TRACK_BETA,
+                            TRACK_ALPHA,
                             new Track().setVersionCodes(apkVersionCodes));
             Track updatedTrack = updateTrackRequest.execute();
             log.info(String.format("Track %s has been updated.", updatedTrack.getTrack()));
 
             // Update recent changes field in apk listing.
             final ApkListing newApkListing = new ApkListing();
-            newApkListing.setRecentChanges(APK_LISTING_RECENT_CHANGES_TEXT);
+            newApkListing.setRecentChanges(APK_LISTING_RECENT_CHANGES_TEXT + " Version Code: " + apk.getVersionCode());
 
             Apklistings.Update
             updateRecentChangesRequest = edits
@@ -117,6 +126,25 @@ public class UploadApkWithListing {
                             newApkListing);
             updateRecentChangesRequest.execute();
             log.info("Recent changes has been updated.");
+
+            // Update listing for US version of the application.
+            final Listing newUsListing = new Listing();
+
+            newUsListing.setTitle(US_LISTING_TITLE)
+                    .setFullDescription(US_LISTING_FULL_DESCRIPTION)
+                    .setShortDescription(US_LISTING_SHORT_DESCRITPION)
+                    .setVideo(LISTINGS_PROMO_VIDEO);
+
+            Edits.Listings.Update updateUSListingsRequest = edits
+                    .listings()
+                    .update(ApplicationConfig.PACKAGE_NAME,
+                            editId,
+                            Locale.US.toString(),
+                            newUsListing);
+            Listing updatedUsListing = updateUSListingsRequest.execute();
+            log.info(String.format("Created new US app listing with title: %s",
+                    updatedUsListing.getTitle()));
+
 
             // Commit changes for edit.
             Commit commitRequest = edits.commit(ApplicationConfig.PACKAGE_NAME, editId);

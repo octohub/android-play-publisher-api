@@ -34,23 +34,25 @@ public class Scheduler {
 
 
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(new MyRunnableTask(), 1,
-                5, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(new MyRunnableTask(), initialDelay,
+                SECONDS_IN_A_DAY, TimeUnit.SECONDS);
+        System.out.println(initialDelay);
 
     }
 
     private static class MyRunnableTask implements Runnable {
         @Override
         public void run() {
+            ZonedDateTime utcNow = ZonedDateTime.now(ZoneId.of("Z"));
             System.out.println("running");
-            String properties;
+            String versionCode = "";
             try {
-                properties = getPropValues();
+                versionCode = getPropValues();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            UploadApkWithListing.main(null);
+            String[] array = new String[]{utcNow.toString()};
+            UploadApkWithListing.main(array);
 
         }
     }
