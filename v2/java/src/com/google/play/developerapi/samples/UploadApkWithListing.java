@@ -86,9 +86,10 @@ public class UploadApkWithListing {
             log.info(String.format("Created edit with id: %s", editId));
 
             // Upload new apk to developer console
-            final String apkPath = UploadApkWithListing.class
-                    .getResource(ApplicationConfig.APK_FILE_PATH)
-                    .toURI().getPath();
+            //final String apkPath = UploadApkWithListing.class
+            //        .getResource(ApplicationConfig.APK_FILE_PATH)
+            //        .toURI().getPath();
+            final String apkPath = "C:\\Users\\Richard\\Documents\\updayte\\app\\build\\outputs\\apk\\app-release.apk";
             final AbstractInputStreamContent apkFile =
                     new FileContent(AndroidPublisherHelper.MIME_TYPE_APK, new File(apkPath));
             Upload uploadRequest = edits
@@ -151,7 +152,7 @@ public class UploadApkWithListing {
             AppEdit appEdit = commitRequest.execute();
             log.info(String.format("App edit with id %s has been comitted", appEdit.getId()));
 
-        } catch (IOException | URISyntaxException | GeneralSecurityException ex) {
+        } catch (IOException | GeneralSecurityException ex) {
             log.error(
                     "Exception was thrown while uploading apk and updating recent changes",
                     ex);
